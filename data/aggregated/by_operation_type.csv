@@ -1,0 +1,72 @@
+purpose_of_flight,severity_class,incidenti
+Aerial Application,Fatal,513
+Aerial Application,Minor,746
+Aerial Application,Serious,540
+Aerial Observation,Fatal,221
+Aerial Observation,Minor,128
+Aerial Observation,Serious,143
+Air Drop,Fatal,3
+Air Drop,Serious,2
+Air Race Show,Fatal,37
+Air Race Show,Minor,16
+Air Race Show,Serious,13
+Air Race/Show,Fatal,29
+Air Race/Show,Minor,3
+Air Race/Show,Serious,17
+Asho,Fatal,4
+Asho,Serious,1
+Banner Tow,Fatal,16
+Banner Tow,Minor,10
+Banner Tow,Serious,27
+Business,Fatal,1057
+Business,Minor,448
+Business,Serious,424
+Executive/Corporate,Fatal,141
+Executive/Corporate,Minor,43
+Executive/Corporate,Serious,52
+External Load,Fatal,28
+External Load,Minor,23
+External Load,Serious,16
+Ferry,Fatal,169
+Ferry,Minor,146
+Ferry,Serious,78
+Firefighting,Fatal,19
+Firefighting,Minor,5
+Firefighting,Serious,5
+Flight Test,Fatal,83
+Flight Test,Minor,55
+Flight Test,Serious,71
+Glider Tow,Fatal,14
+Glider Tow,Minor,6
+Glider Tow,Serious,11
+Instructional,Fatal,1013
+Instructional,Minor,1185
+Instructional,Serious,976
+Other Work Use,Fatal,259
+Other Work Use,Minor,220
+Other Work Use,Serious,219
+Personal,Fatal,10257
+Personal,Minor,6680
+Personal,Serious,6533
+Positioning,Fatal,389
+Positioning,Minor,197
+Positioning,Serious,144
+Public Aircraft,Fatal,175
+Public Aircraft,Minor,111
+Public Aircraft,Serious,93
+Public Aircraft - Federal,Fatal,20
+Public Aircraft - Federal,Minor,11
+Public Aircraft - Federal,Serious,17
+Public Aircraft - Local,Fatal,8
+Public Aircraft - Local,Minor,6
+Public Aircraft - Local,Serious,17
+Public Aircraft - State,Fatal,11
+Public Aircraft - State,Minor,7
+Public Aircraft - State,Serious,12
+Pubs,Minor,2
+Skydiving,Fatal,59
+Skydiving,Minor,14
+Skydiving,Serious,29
+Unknown,Fatal,3129
+Unknown,Minor,1257
+Unknown,Serious,1458

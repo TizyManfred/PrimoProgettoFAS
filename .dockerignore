@@ -1,0 +1,12 @@
+# Escludi cartelle pesanti o inutili per il build Docker
+myvenv/
+notebooks/
+docs/
+.git/
+.DS_Store
+__pycache__/
+
+# Non include i log e i file .csv temporanei
+logs/
+data/cleaned/*.csv
+data/aggregated/*.csv

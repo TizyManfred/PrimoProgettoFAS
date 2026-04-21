@@ -1,0 +1,9 @@
+[2026-04-20 15:39:58] Avvio analisi dati...
+[analyze] Righe caricate: 90348
+[analyze] Salvato /Users/tiziano/Documents/Scuola/Università/Secondo anno/Secondo semestre/FAS/PrimoProgetto/data/aggregated/accidents_per_year.csv
+[analyze] Salvato /Users/tiziano/Documents/Scuola/Università/Secondo anno/Secondo semestre/FAS/PrimoProgetto/data/aggregated/by_flight_phase.csv
+[analyze] Salvato /Users/tiziano/Documents/Scuola/Università/Secondo anno/Secondo semestre/FAS/PrimoProgetto/data/aggregated/weather_vs_severity.csv
+[analyze] Salvato /Users/tiziano/Documents/Scuola/Università/Secondo anno/Secondo semestre/FAS/PrimoProgetto/data/aggregated/by_operation_type.csv
+[analyze] Salvato /Users/tiziano/Documents/Scuola/Università/Secondo anno/Secondo semestre/FAS/PrimoProgetto/data/aggregated/by_us_state.csv
+[analyze] Tutte le aggregazioni completate.
+[2026-04-20 15:40:01] Analisi dati completata. I CSV sono in data/aggregated/

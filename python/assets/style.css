@@ -1,0 +1,137 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Outfit:wght@300;400;600;700&display=swap');
+
+body {
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2, #e0eafc);
+    background-size: 400% 400%;
+    animation: gradientBG 20s ease infinite;
+    font-family: 'Outfit', sans-serif !important;
+    color: #2b2d42;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+@keyframes gradientBG {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.glass-panel {
+    background: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1) !important;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+    padding: 20px;
+}
+
+.glass-panel:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 45px 0 rgba(31, 38, 135, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 1) !important;
+}
+
+.kpi-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 120px;
+}
+
+.kpi-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #5a6a85;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.kpi-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+/* Gradient text — vendor prefix first, then standard */
+.text-gradient-primary {
+    color: #1e3c72; /* fallback per browser senza supporto */
+    background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-danger {
+    color: #d31027; /* fallback */
+    background: linear-gradient(90deg, #d31027 0%, #ea384d 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-warning {
+    color: #f5576c; /* fallback */
+    background: linear-gradient(90deg, #f5576c 0%, #f093fb 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+h2.main-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.7);
+    color: #1a2a40;
+}
+
+/* Customizing Dash Dropdowns */
+.Select-control {
+    background-color: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(163, 186, 195, 0.5) !important;
+    border-radius: 10px !important;
+    color: #2b2d42 !important;
+}
+
+.Select-value-label {
+    color: #2b2d42 !important;
+}
+
+.Select-menu-outer {
+    background-color: #f5f7fa !important;
+    border: 1px solid rgba(163, 186, 195, 0.8) !important;
+    color: #2b2d42 !important;
+    z-index: 9999 !important;
+}
+
+.Select-option {
+    background-color: transparent !important;
+    color: #2b2d42 !important;
+}
+
+.Select-option:hover {
+    background-color: rgba(200, 210, 225, 0.5) !important;
+}
+
+.Select-placeholder {
+    color: #7a8fa5 !important;
+}
+
+/* Customizing Dash Slider */
+.rc-slider-track {
+    background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%) !important;
+}
+
+.rc-slider-handle {
+    border: 2px solid #2a5298 !important;
+    background-color: #fff !important;
+    box-shadow: 0 0 10px rgba(42, 82, 152, 0.3) !important;
+}
