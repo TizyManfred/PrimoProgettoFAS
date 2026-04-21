@@ -24,10 +24,12 @@ Questa fase è il cuore analitico del progetto, scritta in Python per sfruttare 
 - **Pulizia e Normalizzazione** (`scripts/01_clean.sh` -> `python/clean.py`):
     - Trasforma i dati grezzi in un formato "pulito".
     - **Feature Engineering**: Deriva nuove metriche complesse non presenti nel dataset originale.
-    - **Normalizzazione Geografica**: Applica espressioni regolari  avanzate per estrarre le sigle degli stati USA e raggruppa le città per evitare ridondanze.
+    - **Normalizzazione Geografica**: Applica espressioni regolari avanzate per estrarre le sigle degli stati USA e raggruppa le città per evitare ridondanze.
     - **Consolidamento Categorie**: Mappa acronimi multipli (es. "UNK", "Unknown") in categorie uniformi.
 - **Analisi e Aggregazione** (`scripts/02_analyze.sh` -> `python/analyze.py`):
     - Elabora il dato pulito e produce dataset parziali già aggregati per le metriche principali (andamento temporale, fase di volo, ecc.).
+    - > [!NOTE]
+      > **Evoluzione Tecnica**: Inizialmente questi dataset parziali venivano utilizzati direttamente dalla dashboard per semplificare il rendering dei grafici statici. Con l'aumento dell'interattività (filtri incrociati dinamici, zoom sulle mappe e drill-down sui modelli), l'utilizzo di file pre-aggregati è diventato eccessivamente complesso da gestire. Si è quindi optato per il caricamento del dataset integrale "clean" in `app.py`, permettendo calcoli reattivi in tempo reale su qualsiasi combinazione di filtri.
 
 ### Fase 3: Visualizzazione Interattiva (`scripts/03_run_app.sh` -> `python/app.py`)
 - L'applicazione web viene avviata su un web server generato in Python. La dashboard consuma direttamente i dati preparati nella Fase 2, garantendo tempi di caricamento e rendering dei grafici millisecondi.

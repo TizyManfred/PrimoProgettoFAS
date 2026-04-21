@@ -30,7 +30,7 @@ La dashboard sarà disponibile su: **http://localhost:8050**
 ## Struttura del Progetto
 
 ```
-PrimoProgetto/
+PrimoProgettoFAS/
 ├── AviationData.csv          ← Dataset NTSB originale
 ├── run.sh                    ← Entry point principale
 ├── Dockerfile
@@ -46,7 +46,8 @@ PrimoProgetto/
 │   ├── requirements.txt
 │   ├── clean.py              ← Pulizia e normalizzazione dataset
 │   ├── analyze.py            ← Aggregazioni statistiche
-│   └── app.py                ← Dashboard Dash (Python puro, no HTML)
+│   ├── app.py                ← Dashboard Dash (Python puro)
+│   └── assets/               ← Risorse statiche (CSS, icone, ecc.)
 │
 ├── data/                     ← Generato dalla pipeline
 │   ├── cleaned/

@@ -3,6 +3,7 @@ myvenv/
 notebooks/
 docs/
 .git/
+.gitignore
 .DS_Store
 __pycache__/
 
