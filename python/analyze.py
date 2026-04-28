@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""analyze.py — Analisi statistiche e aggregazioni sul dataset pulito."""
+"""analyze.py — Aggregazioni statistiche sul dataset pulito."""
 
 import os
 import sys

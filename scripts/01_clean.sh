@@ -1,8 +1,5 @@
 #!/bin/bash
-# 01_clean.sh — Esegue lo script Python per la pulizia dei dati
-
 set -euo pipefail
-
 cd "$(dirname "$0")"
 mkdir -p ../logs
 

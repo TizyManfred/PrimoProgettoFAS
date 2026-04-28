@@ -1,15 +1,5 @@
 #!/usr/bin/env python3
-"""
-clean.py — Pulizia e normalizzazione del dataset AviationData.csv
-Produce: data/cleaned/aviation_clean.csv
-
-Pipeline:
-1. Carica dati grezzi
-2. Standardizza colonne (snake_case)
-3. Elabora e valida date
-4. Gestisce valori mancanti
-5. Crea metriche derivate (gravità, stato USA)
-"""
+"""clean.py — Pulizia e normalizzazione del dataset."""
 
 import os
 import sys

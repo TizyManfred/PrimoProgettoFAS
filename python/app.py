@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
-"""
-app.py — Dashboard interattiva Plotly Dash
-
-Architettura:
-- Layout: Componenti Python che generano HTML/CSS/JS
-- Callbacks: Funzioni reattive che si eseguono quando input cambiano
-- Dati: Caricati in memoria all'avvio per filtering dinamico
-"""
+"""app.py — Dashboard interattiva Plotly Dash."""
 
 import os
 import pandas as pd
@@ -25,7 +18,6 @@ server = app.server
 
 
 def load_data():
-    """Carica dataset pulito in memoria."""
     if not os.path.exists(CLEAN_CSV):
         return pd.DataFrame()
     df = pd.read_csv(CLEAN_CSV, low_memory=False)
@@ -182,7 +174,7 @@ app.layout = dbc.Container([
     [Input("aircraft-dropdown", "value")]
 )
 def update_model_options(aircraft_type):
-    """Popola dropdown modelli in base al tipo selezionato."""
+    """Popola il dropdown modelli in base al tipo selezionato."""
     if not aircraft_type or df.empty:
         return [], True, None, "Prima seleziona un tipo..."
 
@@ -209,7 +201,7 @@ def update_model_options(aircraft_type):
      Input("state-dropdown", "value")]
 )
 def update_dashboard(year_range, aircraft, model, operation, weather, us_state):
-    """Callback principale: aggiorna tutti i componenti quando filtri cambiano."""
+    """Callback principale: aggiorna KPI e grafici ad ogni cambio filtro."""
 
     if df.empty:
         empty_fig = px.scatter(title="Nessun dato disponibile", template="plotly_white")

@@ -1,8 +1,5 @@
 #!/bin/bash
-# 02_analyze.sh — Esegue lo script Python per le analisi e aggregazioni
-
 set -euo pipefail
-
 cd "$(dirname "$0")"
 mkdir -p ../logs
 
