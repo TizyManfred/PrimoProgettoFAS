@@ -17,8 +17,8 @@ if ! command -v python3 &> /dev/null; then
     exit 1
 fi
 
-# Se non siamo già all'interno di un venv (es. Docker attiva il suo /opt/venv),
-# ne creiamo uno locale .venv per non inquinare il sistema operativo host.
+# Se siamo già all'interno di un venv (es. Docker con /opt/venv),
+# non ne creiamo uno locale.
 VENV_DIR="$PROJECT_ROOT/.venv"
 if [ -z "${VIRTUAL_ENV:-}" ]; then
     if [ ! -d "$VENV_DIR" ]; then
