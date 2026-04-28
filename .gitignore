@@ -1,3 +1,30 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Dati generati
+data/cleaned/
+data/aggregated/
+
+# Log
+logs/
+
+# Python
 __pycache__/
-myvenv/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# IDE
+.vscode/
+.history/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
 .DS_Store
+Thumbs.db
