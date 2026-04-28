@@ -27,14 +27,34 @@ if ! command -v python3 &> /dev/null; then
 fi
 echo "✓ Python trovato: $(python3 --version)"
 
-# Verifica PIP e installa dipendenze
+# Verifica PIP
 if ! command -v pip3 &> /dev/null && ! command -v pip &> /dev/null; then
     echo "[ERRORE] pip non è installato."
     exit 1
 fi
 
+# --- Gestione Virtual Environment locale ---
+# Se non siamo già all'interno di un venv (es. Docker attiva il suo /opt/venv),
+# ne creiamo uno locale .venv per non inquinare il sistema operativo host.
+VENV_DIR="$PROJECT_ROOT/.venv"
+if [ -z "${VIRTUAL_ENV:-}" ]; then
+    if [ ! -d "$VENV_DIR" ]; then
+        echo "Creazione virtual environment in $VENV_DIR..."
+        python3 -m venv "$VENV_DIR"
+        echo "✓ Virtual environment creato."
+    else
+        echo "✓ Virtual environment già esistente in $VENV_DIR."
+    fi
+    # shellcheck source=/dev/null
+    source "$VENV_DIR/bin/activate"
+    echo "✓ Virtual environment attivato: $VIRTUAL_ENV"
+else
+    echo "✓ Già all'interno di un virtual environment: $VIRTUAL_ENV"
+fi
+# ------------------------------------------
+
 echo "Installazione dipendenze Python in corso..."
-pip3 install --quiet --disable-pip-version-check -r "$PROJECT_ROOT/python/requirements.txt" || pip install --quiet --disable-pip-version-check -r "$PROJECT_ROOT/python/requirements.txt"
+pip install --quiet --disable-pip-version-check -r "$PROJECT_ROOT/python/requirements.txt"
 echo "✓ Dipendenze Python installate."
 
 # Creazione cartelle
