@@ -20,12 +20,18 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 # Working directory
 WORKDIR /AnalisiIncidentiAerei
 
-# Copia tutti i file del progetto
+# STEP 1: Copia prima solo requirements.txt per sfruttare il layer cache di Docker
+# In questo modo, modifiche al codice non invalidano il layer di installazione delle dipendenze
+COPY python/requirements.txt python/requirements.txt
+
+# STEP 2: Installa le dipendenze Python (layer cachato separatamente dal codice)
+RUN pip install --no-cache-dir -r python/requirements.txt
+
+# STEP 3: Copia il resto del progetto solo dopo aver installato le dipendenze
 COPY . /AnalisiIncidentiAerei
 
-# Rende eseguibili gli script bash e installa le dipendenze Python
-RUN chmod +x run.sh scripts/*.sh && \
-    pip install --no-cache-dir -r python/requirements.txt
+# Rende eseguibili gli script bash
+RUN chmod +x run.sh scripts/*.sh
 
 # Esegue la pipeline dati (pulizia + analisi) durante il build
 RUN ./run.sh --no-serve
