@@ -13,4 +13,7 @@ if command -v lsof &> /dev/null; then
     fi
 fi
 
-python3 "$PROJECT_ROOT/python/app.py"
+PYTHON_BIN="$PROJECT_ROOT/.venv/bin/python3"
+[ ! -f "$PYTHON_BIN" ] && PYTHON_BIN="python3"
+
+"$PYTHON_BIN" "$PROJECT_ROOT/python/app.py"
