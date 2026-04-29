@@ -1,14 +1,16 @@
 # Relazione Tecnica e Documentazione del Codice: Aviation Accident Dashboard
 
+
 ## 1. Introduzione e Obiettivi del Progetto
 
-Il progetto "Aviation Accident Dashboard" nasce con l'obiettivo di sviluppare una pipeline end-to-end per l'elaborazione, l'analisi e la visualizzazione dei dati relativi agli incidenti aerei, a partire dal dataset pubblico della NTSB (National Transportation Safety Board). 
+Il progetto "Aviation Accident Dashboard" nasce con l'obiettivo di sviluppare una pipeline end-to-end per l'elaborazione, l'analisi e la visualizzazione dei dati relativi agli incidenti aerei, a partire dal dataset pubblico della NTSB (National Transportation Safety Board).
 
-Sviluppato per il corso di **Fondamenti di Amministrazione di Sistema**, il progetto mira a dimostrare competenze di bash, python scripting e docker. 
+Sviluppato per il corso di **Fondamenti di Amministrazione di Sistema**, il progetto mira a dimostrare competenze di bash, python scripting e docker.
 
 L'essenza del progetto non risiede solo nel visualizzare dati, ma nella **creazione di un flusso automatizzato (ETL - Extract, Transform, Load)** governato interamente da script bash, progettato per essere tollerante agli errori e facilmente containerizzabile tramite Docker.
 
 > **Nota:** Per mantenere il codice sorgente pulito ed essenziale, i commenti prolissi sono stati rimossi dai file Python e dagli script Bash. Tutta la logica e il funzionamento dettagliato sono stati consolidati e spiegati in questo documento.
+
 
 ---
 
@@ -17,22 +19,42 @@ L'essenza del progetto non risiede solo nel visualizzare dati, ma nella **creazi
 Il progetto è suddiviso in componenti modulari (Microservizi logici), governati da un orchestratore principale (`run.sh`). La logica si articola in tre fasi principali:
 
 ### Fase 1: Setup e Verifica Ambiente (`scripts/00_setup.sh`)
-- **Controllo Requisiti**: Verifica la presenza della corretta versione di Python e del dataset originale.
-- **Isolamento**: Crea la struttura delle directory necessarie (`data/cleaned/`, `data/aggregated/`, `logs/`).
-- **Dipendenze**: Installa i pacchetti necessari in un virtual environment per mantenere l'ambiente di sistema pulito.
 
-### Fase 2: Elaborazione Dati (Data Pipeline)
-Questa fase è il cuore analitico del progetto, scritta in Python per sfruttare le performance della libreria `pandas`.
-- **Pulizia e Normalizzazione** (`scripts/01_clean.sh` -> `python/clean.py`):
-    - Trasforma i dati grezzi in un formato "pulito".
-    - **Feature Engineering**: Deriva nuove metriche complesse non presenti nel dataset originale.
-    - **Normalizzazione Geografica**: Applica espressioni regolari avanzate per estrarre le sigle degli stati USA.
-    - **Consolidamento Categorie**: Mappa acronimi multipli in categorie uniformi.
-- **Analisi e Aggregazione** (`scripts/02_analyze.sh` -> `python/analyze.py`):
-    - Elabora il dato pulito e produce dataset parziali già aggregati per metriche specifiche (temporale, per stato, ecc.).
+- **Controllo Requisiti**: verifica la presenza della corretta versione di Python e del dataset originale.
+- **Isolamento**: crea la struttura delle directory necessarie (`data/cleaned/`, `data/aggregated/`, `logs/`).
+- **Dipendenze**: installa i pacchetti necessari in un virtual environment per mantenere l'ambiente di sistema pulito.
 
-### Fase 3: Visualizzazione Interattiva (`scripts/03_run_app.sh` -> `python/app.py`)
-- L'applicazione web viene avviata su un web server generato in Python. La dashboard consuma direttamente il dataset clean in memoria, permettendo calcoli reattivi in tempo reale su combinazioni di filtri dinamici.
+---
+
+### Fase 2: Pulizia e Normalizzazione Dati (`scripts/01_clean.sh` -> `python/clean.py`)
+
+Questa fase trasforma il dataset grezzo in una base dati affidabile e coerente, pronta per l’analisi successiva.
+
+- **Pulizia del dataset**: converte i dati grezzi in un formato strutturato e “pulito”.
+- **Feature Engineering**: deriva nuove metriche complesse non presenti nel dataset originale.
+- **Normalizzazione Geografica**: applica espressioni regolari avanzate per estrarre le sigle degli stati USA.
+- **Consolidamento Categorie**: mappa acronimi multipli in categorie uniformi.
+- **Output intermedio**: salva un dataset *cleaned* riutilizzabile dagli step successivi.
+
+---
+
+### Fase 3: Analisi e Aggregazione (`scripts/02_analyze.sh` -> `python/analyze.py`)
+
+Questa fase prende in input il dataset già pulito e produce viste aggregate orientate all’analisi.
+
+- **Elaborazione analitica**: carica il dataset *cleaned* e applica trasformazioni orientate all’analisi.
+- **Aggregazioni mirate**: genera dataset parziali già aggregati per metriche specifiche (temporale, per stato, per categoria, ecc.).
+- **Ottimizzazione per la dashboard**: prepara output leggeri e già strutturati per il layer di visualizzazione.
+- **Output finale**: salva i dataset aggregati in `data/aggregated/`.
+
+---
+
+### Fase 4: Visualizzazione Interattiva (`scripts/03_run_app.sh` -> `python/app.py`)
+
+L’applicazione web espone una dashboard interattiva basata sui dataset prodotti dalla pipeline.
+
+- L’applicazione web viene avviata su un web server generato in Python.
+- La dashboard consuma direttamente il dataset *cleaned* (ed eventualmente quelli aggregati) in memoria, permettendo calcoli reattivi in tempo reale su combinazioni di filtri dinamici.
 
 ---
 
@@ -48,43 +70,89 @@ Questa fase è il cuore analitico del progetto, scritta in Python per sfruttare 
 
 ## 4. Dettaglio del Codice Python
 
-Questa sezione documenta nel dettaglio il funzionamento dei file sorgenti.
+### `00_setup.sh`
 
-### 4.1 `python/clean.py`
-Questo script agisce come fase "Transform" dell'ETL:
-*   **`rename_columns(df)`**: Converte i nomi delle colonne nel formato standard `snake_case` (es. `Event.Id` diventa `event_id`).
-*   **`parse_dates(df)`**: Esegue il parsing di `event_date`, rimuovendo record non validi ed estraendo mese e anno per facilitare le aggregazioni.
-*   **`fill_missing(df)`**: Gestisce i valori null (NaN); le variabili numeriche delle vittime vengono poste a 0, le variabili qualitative etichettate `"Unknown"`.
-*   **`normalize_strings(df)`**: Rimuove spazi vuoti superflui e converte a "Title Case", uniformando le stringhe di testo.
-*   **`group_categories(df)`**: Risolve problemi di varianti sintattiche (unendo `"Unk"`, `"Unknown"`, `"None"`).
-*   **`add_derived_columns(df)`**:
-    *   Calcola la gravità (`severity_class`) con `np.select`, valutando le soglie di vittime mortali vs feriti gravi.
-    *   Sfrutta regex `r",\s*([a-zA-Z]{2})$"` sul campo `location` per estrapolare ed iniettare l'abbreviazione del singolo stato USA (`us_state`), fondamentale per le mappe regionalizzate.
+Questo script è il punto di ingresso tecnico della pipeline: esegue i controlli preliminari sull’ambiente e prepara tutto ciò che serve agli step successivi. In pratica si assicura che Python, i dati e le directory siano in ordine prima di far partire qualsiasi elaborazione.
 
-### 4.2 `python/analyze.py`
-Calcola aggregazioni specifiche basandosi sul CSV ripulito:
-*   `accidents_per_year`: Tendenza storica.
-*   `by_flight_phase`: Incidenti distribuiti durante le fasi (Takeoff, Cruise, Landing ecc.).
-*   `weather_vs_severity`: Creazione di cross-tab per relazioni tra meteo IMC/VMC e tassi di fatalità.
-*   `by_us_state`: Raggruppamento per geolocalizzazione USA.
-*   Questa fase produce backup CSV persistenti molto utili in contesti esterni alla dashboard.
+**Funzioni e feature principali**
 
-### 4.3 `python/app.py`
-Il motore della UI interattiva.
-*   **Caricamento Dati in RAM**: La funzione pre-carica i dati e crea mappature dinamiche (es `US_STATE_NAMES` per convertire la sigla "TX" su mappa visiva "Texas").
-*   **Callback Ad Albero**: 
-    1.  `update_model_options`: Questo callback incrocia i filtri "Tipo Aeromobile" e "Modello", bloccando/abilitando o filtrando le tendine in real-time così da scongiurare selezioni senza set di dati corrispondente.
-    2.  `update_dashboard`: Callback primario. È connesso a ciascun dropdown/slider. Ogni variazione innesca lo smistamento condizionale tramite Pandas sull'intero dataset (`dff_main = dff_base.copy()`). In uscita, alimenta e ridisegna i KPI sommarli in cima (`kpi-totale`, `kpi-vittime`) e i quattro `dcc.Graph` centrali in meno di un secondo.
-*   **Gestione Mappe (Dual-Mode)**: Nello sviluppo del grafico mappa, la logica include uno switch ("If us_state:"). Quando si analizza l'intero territorio mostra un layer `Choropleth` a zone di colore riempitive per ogni Stato. Ma qualora l'utente avesse filtrato uno stato specifico, re-inizializza il canvas passando a `Scattergeo`. In quest'ultimo ricalcola una Pivot sulle singole Coordinate, accorpandole ed ingrandendo sfericamente l'esplosione per la specifica `Città`.
+- **Verifica prerequisiti**: controlla che siano presenti la versione corretta di Python e i dati di input necessari.
+- **Creazione ambiente isolato**: configura un ambiente virtuale tramite `venv`, così da installare le dipendenze senza toccare il sistema globale.
+- **Inizializzazione cartelle**: crea (se mancanti) le directory utilizzate dalla pipeline, ad esempio per dati puliti, dati aggregati e file di log.
+
+---
+
+### `01_clean.sh` e `02_analyze.sh`
+
+Questi script fungono da “regia” per la parte analitica della pipeline: orchestrano l’esecuzione degli script Python dedicati a pulizia e analisi, tracciando tutto sui log e fermando la catena in caso di errori.
+
+**Funzioni e feature principali**
+
+- **Invocazione degli script Python**: eseguono, rispettivamente, gli script di pulizia e quelli di analisi/aggregazione dei dati.
+- **Logging esteso**: instradano l’output verso la cartella `../logs` tramite `tee`, così da avere log persistenti e output leggibile a terminale in un colpo solo.
+- **Gestione robusta degli errori**: verificano il codice di uscita dell’interprete Python e, se diverso da `0`, interrompono l’esecuzione per evitare sovrascritture o corruzione dei dati storici validi.
+
+---
+
+### `03_run_app.sh`
+
+Questo script si occupa di avviare in modo sicuro l’applicazione web che espone la dashboard, verificando prima che le risorse di rete necessarie siano disponibili. In questo modo l’ambiente applicativo parte solo quando le condizioni sono corrette.
+
+**Funzioni e feature principali**
+
+- **Controllo disponibilità porta**: verifica che la porta prevista per il servizio (ad es. `8050`) sia libera, ad esempio tramite `lsof -i:8050`.
+- **Avvio del webserver**: quando i controlli sono superati, avvia il processo che esegue il web server ospitando la dashboard, eventualmente in modalità demonizzata per mantenerlo in esecuzione in background.
+
+---
+
+### `run.sh`
+
+Questo script è l’*entrypoint* della pipeline: coordina l’esecuzione di tutti gli step Bash, offrendo anche una modalità “solo build dati” utile in contesti di test e containerizzazione. È il comando unico che l’utente deve lanciare per far girare l’intero flusso.
+
+**Funzioni e feature principali**
+
+- **Coordinamento degli step**: invoca in sequenza le sotto–routine (`00_setup.sh`, `01_clean.sh`, `02_analyze.sh`, `03_run_app.sh`), per le quali ha i permessi di esecuzione (`+x`).
+- **Flag di test `--no-serve`**: permette di eseguire solo la generazione dei micro–dati (pulizia e analisi), arrestando la pipeline prima dell’esposizione sulla porta; questo comportamento è particolarmente comodo in ambienti containerizzati come Docker, dove spesso si vuole testare la build senza avviare il servizio HTTP.
 
 ---
 
 ## 5. Dettaglio Script Shell e Bash Automation
 
-*   **`00_setup.sh`**: File preparatorio vituperante, fa accertamenti prima di operare (python e dati presenti) e crea la "bolla isolata" tramite istruzione `venv`.
-*   **`01_clean.sh` & `02_analyze.sh`**: Pilotano l'interprete Python verso gli scrip precedentemente visti. Sono arricchiti con cattura di Logging estesa a `../logs` via instradamento `tee`. Se l'interprete da' codice != 0, le esecuzioni implodono a terminale evitando di sovrascrivere o corrompere i dati storici validi.
-*   **`03_run_app.sh`**: Verifica di aver liberi i socket porte (`lsof -i:8050`). In condizioni eccellenti si tramuta nel processo demonizzato del Webserver Host Dashboard.
-*   **`run.sh`**: Lo script entrypoint. Ha il permesso `+x` sulle sub routine. E' stato programmato con flag di testing `--no-serve` per eseguire solo le build dei microdati in pipeline arrestandosi prima della pubblicazione porta, tattica vitale in Docker.
+### `00_setup.sh`
+
+Script preparatorio che effettua tutti i controlli prima di procedere con la pipeline.
+
+- **Verifica prerequisiti**: controlla che siano presenti la versione corretta di Python e i dati di input necessari.
+- **Ambiente isolato**: crea la “bolla” dell’ambiente virtuale tramite `venv`, evitando di contaminare il sistema globale.
+- **Preparazione cartelle**: inizializza eventuali directory richieste dagli step successivi (ad es. per dati puliti, aggregati, log).
+
+---
+
+### `01_clean.sh` e `02_analyze.sh`
+
+Script di orchestrazione che pilotano l’interprete Python verso gli script analitici della pipeline.
+
+- **Invocazione degli script Python**: eseguono, rispettivamente, gli script di pulizia e quelli di analisi/aggregazione dei dati.
+- **Logging esteso**: instradano l’output verso `../logs` utilizzando `tee`, in modo da avere sia log persistenti sia output visibile a terminale.
+- **Gestione degli errori**: se l’interprete Python termina con codice di uscita diverso da `0`, l’esecuzione viene interrotta, prevenendo sovrascritture o corruzione dei dati storici validi.
+
+---
+
+### `03_run_app.sh`
+
+Script responsabile dell’avvio dell’applicazione web (dashboard).
+
+- **Controllo porte**: verifica che la porta prevista per il servizio (es. `8050`) sia libera, ad esempio tramite `lsof -i:8050`.
+- **Avvio webserver**: in condizioni corrette, avvia il processo che esegue il web server ospitando la dashboard, eventualmente in modalità demonizzata.
+
+---
+
+### `run.sh`
+
+Script di *entrypoint* della pipeline.
+
+- **Coordinamento degli step**: invoca in sequenza le sotto–routine (`00_setup.sh`, `01_clean.sh`, `02_analyze.sh`, `03_run_app.sh`), per le quali ha i permessi di esecuzione (`+x`).
+- **Flag di test `--no-serve`**: consente di eseguire solo la build dei micro–dati (pulizia e analisi) arrestando la pipeline prima dell’esposizione sulla porta, approccio particolarmente utile in ambienti containerizzati (es. Docker).
 
 ---
 

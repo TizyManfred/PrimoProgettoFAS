@@ -9,21 +9,38 @@ sviluppata per il corso di **Fondamenti di Amministrazione di Sistema**.
 
 ### Metodo 1 — Esecuzione locale (Bash + Python)
 
+Se il file non è ancora eseguibile, rendi eseguibile lo script `run.sh`:
+
 ```bash
 cd PrimoProgetto
 chmod +x run.sh
-bash run.sh
 ```
 
-La dashboard sarà disponibile su: **http://localhost:8050**
+Poi avvia la pipeline:
+
+```bash
+./run.sh
+```
+
+La dashboard sarà disponibile all’indirizzo: **http://localhost:8050**
 
 ### Metodo 2 — Docker (consigliato)
+
+Questo metodo avvia l’intera applicazione dentro un container Docker, garantendo un ambiente riproducibile e isolato.
+
+Se lo hai già eseguito è consigliabile una pulizia preventiva di eventuali container vecchi con lo stesso nome:
+
+```bash
+docker rm -f aviation_dashboard 2>/dev/null || true
+```
+
+Avvio dell'ambiente Docker (build immagine + start container):
 
 ```bash
 docker compose up --build
 ```
 
-La dashboard sarà disponibile su: **http://localhost:8050**
+Una volta che il container è in esecuzione, la dashboard sarà disponibile all’indirizzo: **http://localhost:8050**
 
 ---
 
@@ -35,6 +52,9 @@ PrimoProgettoFAS/
 ├── run.sh                    ← Entry point principale
 ├── Dockerfile
 ├── docker-compose.yml
+├── .gitignore
+├── .dockerignore
+├── README.md
 │
 ├── scripts/
 │   ├── 00_setup.sh           ← Verifica prerequisiti e installa dipendenze
@@ -47,7 +67,8 @@ PrimoProgettoFAS/
 │   ├── clean.py              ← Pulizia e normalizzazione dataset
 │   ├── analyze.py            ← Aggregazioni statistiche
 │   ├── app.py                ← Dashboard Dash (Python puro)
-│   └── assets/               ← Risorse statiche (CSS, icone, ecc.)
+│   └── assets/               ← Risorse statiche 
+|       └── style.css
 │
 ├── data/                     ← Generato dalla pipeline
 │   ├── cleaned/
@@ -63,4 +84,4 @@ PrimoProgettoFAS/
 - Python 3.10+
 - pip3
 - Bash (macOS / Linux)
-- (Opzionale) Docker e Docker Compose
+- Docker e Docker Compose
