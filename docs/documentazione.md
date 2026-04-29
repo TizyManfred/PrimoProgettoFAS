@@ -70,49 +70,63 @@ L’applicazione web espone una dashboard interattiva basata sui dataset prodott
 
 ## 4. Dettaglio del Codice Python
 
-### `00_setup.sh`
+La componente Python rappresenta il cuore analitico del progetto. Mentre gli script Bash orchestrano l’esecuzione della pipeline, il lavoro effettivo di trasformazione, analisi e visualizzazione dei dati viene svolto in Python, sfruttando librerie come `pandas`, `numpy` e `dash`.
 
-Questo script è il punto di ingresso tecnico della pipeline: esegue i controlli preliminari sull’ambiente e prepara tutto ciò che serve agli step successivi. In pratica si assicura che Python, i dati e le directory siano in ordine prima di far partire qualsiasi elaborazione.
+L’architettura Python è suddivisa in tre moduli principali, ognuno con una responsabilità ben definita: pulizia del dato, aggregazione analitica e pubblicazione della dashboard web. Questa separazione rende il codice più leggibile, riusabile e facile da manutenere.
+
+### `python/clean.py`
+
+Questo script implementa la fase di pulizia e normalizzazione del dataset originale. Il suo compito è convertire i dati grezzi in un dataset coerente, standardizzato e pronto per essere elaborato nei passaggi successivi.
 
 **Funzioni e feature principali**
 
-- **Verifica prerequisiti**: controlla che siano presenti la versione corretta di Python e i dati di input necessari.
-- **Creazione ambiente isolato**: configura un ambiente virtuale tramite `venv`, così da installare le dipendenze senza toccare il sistema globale.
-- **Inizializzazione cartelle**: crea (se mancanti) le directory utilizzate dalla pipeline, ad esempio per dati puliti, dati aggregati e file di log.
+- **Caricamento del dataset raw**: importa il file originale in un DataFrame `pandas`.
+- **Data cleaning**: gestisce valori mancanti, uniforma i tipi di dato e corregge eventuali incoerenze nel dataset.
+- **Feature engineering**: genera nuove colonne derivate utili all’analisi, non presenti nel dataset sorgente.
+- **Normalizzazione geografica**: estrae e standardizza le sigle degli stati USA tramite espressioni regolari.
+- **Consolidamento delle categorie**: uniforma valori testuali, acronimi e categorie ripetute o scritte in modo non omogeneo.
+- **Esportazione del dato pulito**: salva il risultato nella cartella `data/cleaned/` per renderlo disponibile allo step di analisi.
 
 ---
 
-### `01_clean.sh` e `02_analyze.sh`
+### `python/analyze.py`
 
-Questi script fungono da “regia” per la parte analitica della pipeline: orchestrano l’esecuzione degli script Python dedicati a pulizia e analisi, tracciando tutto sui log e fermando la catena in caso di errori.
+Questo script riceve in input il dataset già pulito e produce una serie di viste aggregate orientate all’analisi esplorativa e alla visualizzazione. È il modulo che trasforma il dato normalizzato in micro–dataset già ottimizzati per la dashboard.
 
 **Funzioni e feature principali**
 
-- **Invocazione degli script Python**: eseguono, rispettivamente, gli script di pulizia e quelli di analisi/aggregazione dei dati.
-- **Logging esteso**: instradano l’output verso la cartella `../logs` tramite `tee`, così da avere log persistenti e output leggibile a terminale in un colpo solo.
-- **Gestione robusta degli errori**: verificano il codice di uscita dell’interprete Python e, se diverso da `0`, interrompono l’esecuzione per evitare sovrascritture o corruzione dei dati storici validi.
+- **Lettura del dataset cleaned**: carica il file prodotto da `clean.py`.
+- **Aggregazioni statistiche**: calcola indicatori e raggruppamenti per dimensioni rilevanti, ad esempio temporali, geografiche o categoriali.
+- **Produzione di dataset intermedi**: crea tabelle aggregate specifiche per supportare grafici, filtri e metriche di sintesi.
+- **Ottimizzazione per la visualizzazione**: riduce il carico computazionale lato dashboard preparando in anticipo i dati più costosi da calcolare.
+- **Esportazione degli output analitici**: salva i risultati nella cartella `data/aggregated/`.
 
 ---
 
-### `03_run_app.sh`
+### `python/app.py`
 
-Questo script si occupa di avviare in modo sicuro l’applicazione web che espone la dashboard, verificando prima che le risorse di rete necessarie siano disponibili. In questo modo l’ambiente applicativo parte solo quando le condizioni sono corrette.
+Questo script definisce e avvia l’applicazione web interattiva sviluppata con Plotly Dash. La dashboard costituisce il livello finale del progetto, in cui i dataset elaborati dalla pipeline vengono esposti tramite grafici, filtri e componenti reattivi.
 
 **Funzioni e feature principali**
 
-- **Controllo disponibilità porta**: verifica che la porta prevista per il servizio (ad es. `8050`) sia libera, ad esempio tramite `lsof -i:8050`.
-- **Avvio del webserver**: quando i controlli sono superati, avvia il processo che esegue il web server ospitando la dashboard, eventualmente in modalità demonizzata per mantenerlo in esecuzione in background.
+- **Inizializzazione dell’app Dash**: crea il server applicativo e configura la struttura principale della web app.
+- **Caricamento dei dati**: importa in memoria il dataset pulito e/o i dataset aggregati necessari alla visualizzazione.
+- **Definizione del layout**: organizza componenti HTML, grafici Plotly, dropdown, slider e controlli interattivi.
+- **Callback reattive**: aggiorna dinamicamente i grafici e le metriche in risposta alle interazioni dell’utente.
+- **Avvio del server web**: espone la dashboard sulla porta configurata (tipicamente `8050`), rendendola raggiungibile via browser.
+- **Compatibilità con Docker**: il server viene eseguito su `0.0.0.0`, così da risultare accessibile anche dall’host quando l’app gira in un container.
 
 ---
 
-### `run.sh`
+### Ruolo complessivo della componente Python
 
-Questo script è l’*entrypoint* della pipeline: coordina l’esecuzione di tutti gli step Bash, offrendo anche una modalità “solo build dati” utile in contesti di test e containerizzazione. È il comando unico che l’utente deve lanciare per far girare l’intero flusso.
+Nel complesso, il codice Python realizza l’intera catena di valore del dato:
 
-**Funzioni e feature principali**
+1. **Acquisizione e pulizia** del dataset sorgente.
+2. **Trasformazione e aggregazione** in strutture analitiche compatte.
+3. **Esposizione interattiva** dei risultati tramite una dashboard web.
 
-- **Coordinamento degli step**: invoca in sequenza le sotto–routine (`00_setup.sh`, `01_clean.sh`, `02_analyze.sh`, `03_run_app.sh`), per le quali ha i permessi di esecuzione (`+x`).
-- **Flag di test `--no-serve`**: permette di eseguire solo la generazione dei micro–dati (pulizia e analisi), arrestando la pipeline prima dell’esposizione sulla porta; questo comportamento è particolarmente comodo in ambienti containerizzati come Docker, dove spesso si vuole testare la build senza avviare il servizio HTTP.
+Questa suddivisione in moduli specializzati consente di mantenere separati i livelli di preprocessing, analisi e presentazione, seguendo una struttura chiara e facilmente estendibile.
 
 ---
 
@@ -128,13 +142,23 @@ Script preparatorio che effettua tutti i controlli prima di procedere con la pip
 
 ---
 
-### `01_clean.sh` e `02_analyze.sh`
+### `01_clean.sh`
 
-Script di orchestrazione che pilotano l’interprete Python verso gli script analitici della pipeline.
+Script di orchestrazione dedicato alla fase di pulizia: invoca lo script Python `clean.py` e gestisce logging ed errori relativi a questo step della pipeline.
 
-- **Invocazione degli script Python**: eseguono, rispettivamente, gli script di pulizia e quelli di analisi/aggregazione dei dati.
-- **Logging esteso**: instradano l’output verso `../logs` utilizzando `tee`, in modo da avere sia log persistenti sia output visibile a terminale.
-- **Gestione degli errori**: se l’interprete Python termina con codice di uscita diverso da `0`, l’esecuzione viene interrotta, prevenendo sovrascritture o corruzione dei dati storici validi.
+- **Invocazione dello script Python di pulizia**: esegue `python/clean.py`, che produce il dataset *cleaned* a partire dal dato grezzo.
+- **Logging esteso**: instrada l’output (stdout e/o stderr) verso la cartella `../logs` tramite `tee`, così da avere log persistenti e output leggibile a terminale.
+- **Gestione degli errori**: controlla il codice di uscita dell’interprete Python e, se diverso da `0`, interrompe l’esecuzione per evitare di proseguire con dati non validi o parziali.
+
+---
+
+### `02_analyze.sh`
+
+Script di orchestrazione dedicato alla fase di analisi e aggregazione: invoca lo script Python `analyze.py` e garantisce tracciabilità e robustezza di questo step.
+
+- **Invocazione dello script Python di analisi**: esegue `python/analyze.py`, che legge il dataset pulito e genera i dataset aggregati necessari alla dashboard.
+- **Logging esteso**: come per `01_clean.sh`, convoglia l’output verso `../logs` tramite `tee`, per mantenere uno storico delle esecuzioni analitiche.
+- **Gestione degli errori**: interrompe la pipeline se il processo Python restituisce un codice di uscita diverso da `0`, prevenendo la pubblicazione o il riuso di aggregati incoerenti.
 
 ---
 
